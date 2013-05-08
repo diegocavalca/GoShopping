@@ -1,0 +1,101 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta http-equiv="Content-type" name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+    <title>AD Shopping</title>
+
+    <script src="jquery.mobile/jquery-1.7.2.min"></script>
+	<script src="jquery.mobile/jquery.mobile-1.1.0.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="cordova-1.9.0.js"></script>
+	
+	</head>
+  
+  <body>
+	<div id="explore" data-role="page" class="type-interior" data-theme="a">
+	<script type="text/javascript" charset="utf-8">
+		$('#explore').live('pagecreate',function(event){
+			
+   			// Info do shopping
+   			var shopping = window.localStorage.getItem("shopping");
+   			$("#shoppingLogo").attr("src","http://www."+shopping+".com.br/imagens/logo.png");
+   						
+		});
+	</script>
+
+		<div data-role="header" data-id="foo1" data-position="fixed">
+			<div data-role="navbar">
+				<ul>
+					<li><a data-rel="back" data-iconpos="top" data-icon="back">Voltar</a></li>
+					<li><a data-iconpos="top" data-icon="info">Informa&ccedil;&otilde;es</a></li>
+					<li><a href="estacionamento.html" data-ajax="false" data-iconpos="top" data-icon="grid">Minha vaga</a></li>
+					<!--<li><a data-iconpos="top" data-icon="refresh">Sincronizar</a></li>-->					
+				</ul>
+		   </div>
+		</div>
+	
+		<div data-role="content">			
+			
+			<center>
+				<img id="shoppingLogo" style="width:95%"/>		
+			</center>
+			
+			<h2>Explore: </h2>
+			<ul data-role="listview" data-inset="true">
+				<li page="Alimentacao">
+					<a href="alimentacao.html" >
+						<h3>Alimenta&ccedil;&atilde;o</h3>
+						<p>Op&ccedil;&otilde;es em gastronomia</p>
+					</a>
+				</li>
+				<li page="Cinema">
+					<a href="cinema.html" >
+						<h3>Cinema</h3>
+						<p>Programa&ccedil;&atilde;o e filmes em cartaz</p>
+					</a>
+				</li>
+				<li page="Loja">
+					<a href="loja.html" >
+						<h3>Lojas</h3>
+						<p>Explore o shopping e suas lojas</p>
+					</a>
+					<!--<ul class="listLoja" shopping="baurushopping" data-role="listview" data-filter="true"></ul>-->
+				</li>
+				<li page="Servico">
+					<a href="servico.html" >
+						<h3>Servi&ccedil;os</h3>
+						<p>Informa&ccedil;&otilde;es sobre servi&ccedil;os dispon&iacute;eis</p>
+					</a>
+				</li>
+				<!--
+				<li page="Estacionamento">
+					<a href="estacionamento.html">
+						<h3>Estacionamento</h3>
+						<p>Marque ou consulte a vaga onde estacionou seu carro</p>
+					</a>
+				</li>
+				-->
+			</ul>
+			<!--
+
+			-->
+			
+		</div>
+
+	</div>	
+	<!--
+	<script type="text/javascript" charset="utf-8" src="apis/accelerometer.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/camera.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/capture.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/compass.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/connection.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/contacts.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/device.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/events.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/file.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/geolocation.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/media.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/notification.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/storage.js"></script> 	
+	-->		
+  </body>
+</html>

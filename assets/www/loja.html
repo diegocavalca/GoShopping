@@ -1,0 +1,124 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta http-equiv="Content-type" name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+    <title>AD Shopping</title>
+    
+	<link rel="stylesheet" href="css/themes/goshop.css" />
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile.structure-1.2.0.min.css" />
+
+    <script src="jquery.mobile/jquery-1.7.2.min"></script>
+	<script src="jquery.mobile/jquery.mobile-1.1.0.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="cordova-1.9.0.js"></script>
+  
+	<!-- CDN Respositories: For production, replace lines above with these uncommented minified versions -->
+	<!-- <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.css" />-->
+	<!-- <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>-->
+	<!-- <script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>-->
+	
+	</head>
+  
+  <body>
+	<div id="loja" data-role="page" class="type-interior" data-theme="a">
+	<script type="text/javascript" charset="utf-8">
+	$('#loja').live('pagecreate',function(event){
+			
+		// Info do shopping
+		var shopping = window.localStorage.getItem("shopping");
+		$("#shoppingLogo").attr("src","http://www."+shopping+".com.br/imagens/logo.png");
+	
+		// Carregando registros...	        	
+		setTimeout(function() {
+        	
+        	if($("ul#listaLojas li").length==0){
+        		// Informacoes basicas...
+        		var shopping = window.localStorage.getItem("shopping");
+        		var list = $("ul#listaLojas");
+        		
+				$.ajax({
+				  url: "http://www."+shopping+".com.br/json/loja-json.asp?page=loja&buscaAlfabeto=everything",
+				  success: function(data) {
+				  	 
+				  	 var obj = $.parseJSON(data);
+					 $.each(obj, function(i, value){
+						
+					 	// Montando conteudo da loja
+					 	var line = '<li loja="'+obj[i].loja+'"><a><h3>'+obj[i].lojaNome+'</h3></a></li>';
+					 	list.append(line);
+					 	
+					 });
+				     list.listview('refresh');
+				     
+				  },
+				  beforeSend: function(){
+				  	 list.empty();
+				     $.mobile.showPageLoadingMsg("b", "Carregando registros...", false);
+				  },
+				  complete: function(){
+				     $.mobile.hidePageLoadingMsg();
+				  }
+				});
+			}
+
+		}, 1000);
+    		        	
+    		        	
+    	// Detalhes sobre a loja...
+    	$("ul#listaLojas li").live('click',function(){
+    	
+    		
+		    // Salvando ID e TIPO na sessao, para exibir detalhes...	
+		    var loja = $(this).attr("loja");
+		    var page = 'loja';
+		    
+	        window.localStorage.setItem("loja", loja);
+	        window.localStorage.setItem("page", page);
+	        
+	        // Redirecionando...
+	        $.mobile.changePage('detalhes.html');
+	        
+    	});
+    	
+    });
+    </script>	
+	    
+		<div data-role="header" data-id="foo1" data-position="fixed">
+			<div data-role="navbar">
+				<ul>
+					<li><a data-rel="back" data-iconpos="top" data-icon="back">Voltar</a></li>
+					<li><a data-iconpos="top" data-icon="info">Informa&ccedil;&otilde;es</a></li>
+					<li><a href="estacionamento.html" data-ajax="false" data-iconpos="top" data-icon="grid">Minha vaga</a></li>
+					<!--<li><a data-iconpos="top" data-icon="refresh">Sincronizar</a></li>-->					
+				</ul>
+		   </div>
+		</div>
+	
+		<div data-role="content">			
+						
+			<center>
+				<img id="shoppingLogo" style="width:95%"/>		
+			</center>
+			
+			<h2>Lojas: </h2>
+			<ul id="listaLojas" data-role="listview" data-filter="true" data-inset="true"></ul>
+			
+		</div>
+		
+	</div>	
+	<!--
+	<script type="text/javascript" charset="utf-8" src="apis/accelerometer.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/camera.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/capture.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/compass.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/connection.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/contacts.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/device.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/events.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/file.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/geolocation.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/media.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/notification.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/storage.js"></script> 
+	-->			
+  </body>
+</html>

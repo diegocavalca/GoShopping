@@ -1,0 +1,201 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta http-equiv="Content-type" name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+    <title>AD Shopping</title>
+    
+	<link rel="stylesheet" href="css/themes/goshop.css" />
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile.structure-1.2.0.min.css" />
+
+    <script src="jquery.mobile/jquery-1.7.2.min"></script>
+	<script src="jquery.mobile/jquery.mobile-1.1.0.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="cordova-1.9.0.js"></script>
+		
+	<script>
+		var scanCode = function() {
+
+		}
+	</script>
+  </head>
+  
+  <body>
+	<div id="estacionamento" data-role="page" class="type-interior" data-theme="a">
+	<script type="text/javascript" charset="utf-8">
+	$('#estacionamento').live('pagecreate',function(event){
+	
+	    var db = window.openDatabase("Database", "1.0", "GoShop", 200000);
+	
+		function exibeVaga(){
+			
+			$("#listaEstacionamento li").remove();
+			$.mobile.showPageLoadingMsg();
+			
+			// Consultar historico de vagas...
+			db.transaction(
+				function(tx){
+					//tx.executeSql('DROP TABLE IF EXISTS estacionamento');
+					tx.executeSql('CREATE TABLE IF NOT EXISTS estacionamento (id INTEGER PRIMARY KEY, local TEXT NOT NULL, vaga TEXT NOT NULL, data TEXT NOT NULL, hora TEXT NOT NULL)');
+					tx.executeSql(
+						'SELECT * FROM estacionamento ORDER BY id desc', [], 
+						function(tx, results){
+														
+							if(results.rows.length>0){
+								$("#listaEstacionamento").append('<li data-role="list-divider" data-theme="b">'+results.rows.item(0).local+' <span class="ui-li-count">'+results.rows.item(0).data+'</span></li><li><a><h3>VAGA: '+results.rows.item(0).vaga+'</h3><p>Entrada &agrave;s '+results.rows.item(0).hora+'</p></a></li>');
+							}else{
+								$("#listaEstacionamento").append('<li data-role="list-divider" data-theme="b">Como funciona <span class="ui-li-count">Clicou, escaneou, gravou!</span></li><li><a class="btnScan"><h3>&Eacute; muito simples!</h3><p style="overflow: visible;white-space: normal;margin-right: 5px;font-size:14px !important">Basta clicar no bot&atilde;o "Guardar Vaga", apontar a cam&ecirc;ra para o c&oacute;digo de barras (QR)mais pr&oacute;ximo de voc&ecirc; e pronto, sua vaga est&aacute; salva!<br/><br/>Agora j&aacute; pode fazer suas compras tranquilamente e, quando for ir embora, basta clicar no menu "Minha vaga"que o GoShop ir&aacute; te ajudar a localizar seu ve&iacute;culo ;)</p></a></li>');	
+							}
+							
+							$("#listaEstacionamento").listview('refresh');
+							$.mobile.hidePageLoadingMsg();
+							
+						}, 
+			        	function(tx, err) {
+				        	alert("Erro [2]: "+err);
+				        	$.mobile.hidePageLoadingMsg();
+			        	}
+					);
+				},
+	        	function(tx, err) {
+		        	alert("Erro [1]: "+err);
+		        	$.mobile.hidePageLoadingMsg();
+	        	}
+			);
+			
+		}
+		
+		/********************************************************************
+								RECURSO TEMPORARIO
+		********************************************************************/
+		$(".btnLimpar").live('click',function(){
+			
+		    navigator.notification.confirm(
+		        'Deseja realmente limpar todo o histórico de vagas do aplicativo GoShop?',
+		        function(button) {
+		        	if(button==1){
+						db.transaction(
+							function(tx){
+								tx.executeSql('DROP TABLE IF EXISTS estacionamento');
+								
+								alert('Limpeza realizada com sucesso!');
+								  
+								// Reprocessar a tela...
+								exibeVaga();
+							},
+				        	function(tx, err) {
+					        	alert("Erro [1]: "+err);
+				        	}
+						);			        	
+		        	}
+		        },
+		        'Limpar Vagas',
+		        'Sim,Não'
+		    );		
+			    
+			return false;
+		});		
+		
+		$(".btnScan").live('click',function(){
+			
+			$.mobile.showPageLoadingMsg();
+			    
+		    window.plugins.barcodeScanner.scan(function(result) {
+		    	if(result.cancelled==false){
+					try {
+					   var codigo = $.parseJSON(result.text);
+					  
+					   // Inserir nova vaga...
+					   db.transaction(
+						  function(tx){
+							  tx.executeSql('CREATE TABLE IF NOT EXISTS estacionamento (id INTEGER PRIMARY KEY, local TEXT NOT NULL, vaga TEXT NOT NULL, data TEXT NOT NULL, hora TEXT NOT NULL)');
+							  
+							  // Data e Hora
+							  var date = new Date();
+							  dia = date.getDate();
+							  mes = date.getMonth()+1;
+							  ano = date.getFullYear();
+						      horas = date.getHours();
+							  minutos = date.getMinutes();
+							  segundos = date.getSeconds();
+							  var data = dia+'/'+mes+'/'+ano;
+							  var hora = horas+':'+minutos+':'+segundos;								  
+
+							  tx.executeSql('INSERT INTO estacionamento (local, vaga, data, hora) VALUES ("'+codigo.local+'", "'+codigo.vaga+'", "'+data+'", "'+hora+'")');
+							  
+							  alert('Vaga salva com sucesso! \n\n Local: '+codigo.local+' \n Vaga: '+codigo.vaga);
+							  
+							  // Reprocessar a tela...
+							  exibeVaga();
+						  },
+			        	  function(tx, err) {
+				        	  alert("Erro: "+err);
+			        	  }
+					   );
+					}
+					catch (err) {
+					  alert("ERRO: Código inválido. Tente novamente.");
+					}
+		    	
+		    	}
+		    }, function(error) {
+		        alert("Scan failed: " + error);
+		    });
+		    $.mobile.hidePageLoadingMsg();
+		  
+			
+			return false;
+			
+		});
+
+		// Verificar vagas salvas
+		exibeVaga();
+		
+    });
+	</script>	
+	    
+
+		<div data-role="header" data-position="fixed">
+			<div data-role="navbar">
+				<ul>
+					<li><a href="index.html" data-iconpos="top" data-icon="back">Voltar</a></li>
+					<!--<li><a data-iconpos="top" data-icon="info">Informa&ccedil;&otilde;es</a></li>-->
+					<li><a class="btnLimpar" data-iconpos="top" data-icon="delete">Limpar</a></li>
+					<li><a class="btnScan" data-iconpos="top" data-icon="grid">Guardar Vaga</a></li>
+				</ul>
+			</div>
+		</div>
+		
+		<div data-role="content" >			
+			
+			<p align="center">
+				<img src="images/estacionamento.png" style="90%"/>
+			</p>			
+			<h2>Minha Vaga: </h2>
+			<p style="margin-bottom:30px">
+				Localize a vaga em que deixou seu ve&iacute;culo no estacionamento
+			</p>
+
+			<ul id="listaEstacionamento" data-role="listview"></ul>
+			
+		</div>
+		
+	</div>	
+
+	<script type="text/javascript" charset="utf-8" src="apis/geolocation.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/barcodescanner.js"></script>
+	
+	<!--
+	<script type="text/javascript" charset="utf-8" src="apis/accelerometer.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/camera.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/capture.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/compass.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/connection.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/contacts.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/device.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/events.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/file.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/media.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/notification.js"></script>
+	<script type="text/javascript" charset="utf-8" src="apis/storage.js"></script> 
+	-->			
+  </body>
+</html>
